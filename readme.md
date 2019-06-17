@@ -39,4 +39,6 @@ Password : password
 
 ## Laravel Builder Usage
 
+( Note : This link be accessed by admin only )
+
 Goto : http://localhost:8000/generator_builder
