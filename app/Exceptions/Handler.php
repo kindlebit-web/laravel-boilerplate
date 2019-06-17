@@ -4,6 +4,11 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Spatie\MediaLibrary\Exceptions\FileCannotBeAdded\FileUnacceptableForCollection;
+use Illuminate\Session\TokenMismatchException;
 
 class Handler extends ExceptionHandler
 {
@@ -46,6 +51,31 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if($request->wantsJson())
+        {          
+          if ($exception instanceof NotFoundHttpException) {
+
+            return response()->json(['success' => false, 'message' => 'Route not found'], 404);
+
+          } elseif($exception instanceof MethodNotAllowedHttpException) {
+
+            return response()->json(['success' => false, 'message' => $request->method() . ' method is not allowed for this endpoint.'], 403);
+
+          } elseif($exception instanceof ModelNotFoundException) {
+
+            return response()->json(['success' => false, 'message' => 'Model not allowed'], 404);
+
+          } elseif($exception instanceof FileUnacceptableForCollection) {
+
+            return response()->json(['success' => false, 'message' => 'This file format is not allowed.'], 403);
+
+          } 
+        }
+
+        if ($exception instanceof TokenMismatchException) {
+           return redirect()->back()->with('error', 'Your page session has been expired. Please try again.');
+        }
+
         return parent::render($request, $exception);
     }
 }

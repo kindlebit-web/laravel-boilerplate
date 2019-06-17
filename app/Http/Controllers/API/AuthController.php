@@ -9,13 +9,13 @@ use JWTAuthException;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Http\Resources\UserResource;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\AppBaseController;
 use App\Repositories\UserRepository;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Requests\API\{ LoginRequest, RegisterRequest, GoogleRequest };
 use App\Http\Requests\API\{ FacebookRequest, UpdateProfileRequest, ChangePasswordRequest };
 
-class AuthController extends Controller
+class AuthController extends AppBaseController
 {
 
     private $repo;
@@ -30,20 +30,20 @@ class AuthController extends Controller
         $token = null;
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return ApiResponse::error(__('invalid_login'));
+                return $this->sendError(__('invalid_login'));
             }
         } catch (JWTAuthException $e) {
-            return ApiResponse::error(__('token_create_failed'));
+            return $this->sendError(__('token_create_failed'));
         }
         
         if($request->user()->hasVerifiedEmail() == false) {
           auth()->logout();
-          return ApiResponse::error(__('email_not_verified'));
+          return $this->sendError(__('email_not_verified'));
         }
 
         if($request->user()->isActive() == false) {
           auth()->logout();
-          return ApiResponse::error(__('account_deact'));
+          return $this->sendError(__('account_deact'));
         }
 
         $user = $request->user();
@@ -58,9 +58,8 @@ class AuthController extends Controller
           $user->longitude = $request->longitude;
           $user->save();
         }
-
         $user = new UserResource($user, $token);
-        return ApiResponse::success('Success', $user);
+        return $this->sendResponse('Success', $user);
     }
 
     /**
@@ -85,7 +84,7 @@ class AuthController extends Controller
 
             event(new Registered($user));
             $user = new UserResource($user);
-            return ApiResponse::success(__('We have sent you confirmation email.'), $user);
+            return $this->sendResponse(__('We have sent you confirmation email.'), $user);
         });
     }
 
@@ -103,16 +102,16 @@ class AuthController extends Controller
         }
         try {
             if (! $token = JWTAuth::fromUser($user)) {
-              return ApiResponse::error('invalid_credentials');
+              return $this->sendError('invalid_credentials');
             }
         } catch (JWTException $e) {
-            return ApiResponse::error('could_not_create_token');
+            return $this->sendError('could_not_create_token');
         }
         $user = new UserResource($user, $token);
-        return ApiResponse::success('success', $user);
+        return $this->sendResponse('success', $user);
 
        } else {
-        return ApiResponse::error('User not registered');
+        return $this->sendError('User not registered');
        }
 
     }
@@ -131,16 +130,16 @@ class AuthController extends Controller
         }
         try {
             if (! $token = JWTAuth::fromUser($user)) {
-              return ApiResponse::error('invalid_credentials');
+              return $this->sendError('invalid_credentials');
             }
         } catch (JWTException $e) {
-            return ApiResponse::error('could_not_create_token');
+            return $this->sendError('could_not_create_token');
         }
         $user = new UserResource($user, $token);
-        return ApiResponse::success('success', $user);
+        return $this->sendResponse('success', $user);
 
        } else {
-        return ApiResponse::error('User not registered');
+        return $this->sendError('User not registered');
        }
 
     }
@@ -149,7 +148,7 @@ class AuthController extends Controller
     {
         $user  = JWTAuth::toUser($request->token); 
         $user = new UserResource($user);
-        return ApiResponse::success('Success.', $user);
+        return $this->sendResponse('Success.', $user);
     }
 
     public function updateProfile(UpdateProfileRequest $request)
@@ -173,7 +172,7 @@ class AuthController extends Controller
 
         $user->save();
         $user = new UserResource($user);
-        return ApiResponse::success(__('profile_udpated'), $user); 
+        return $this->sendResponse(__('profile_udpated'), $user); 
     } 
 
 
@@ -183,12 +182,12 @@ class AuthController extends Controller
         $oldpassword = $request->oldpassword;     
         $newpassword = bcrypt($request->newpassword);
         if (!\Hash::check($oldpassword, $user->password)) {
-           return ApiResponse::error(__('pwd_doesnt_match'));
+           return $this->sendError(__('pwd_doesnt_match'));
         }
         $user->password = $newpassword;
         $user->save();
         $user = new UserResource($user);
-        return ApiResponse::success(__('password_updated'), $user); 
+        return $this->sendResponse(__('password_updated'), $user); 
     }
 
     /**
@@ -200,6 +199,6 @@ class AuthController extends Controller
     {
         $token = JWTAuth::parseToken()->refresh();
         $user = new UserResource($request->user(), $token);
-        return ApiResponse::success('success', $user);
+        return $this->sendResponse('success', $user);
     }
 }
