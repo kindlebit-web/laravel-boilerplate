@@ -7,6 +7,7 @@ use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\Facades\Schema;
+use TCG\Voyager\Facades\Voyager;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,5 +30,6 @@ class AppServiceProvider extends ServiceProvider
     {
         User::observe(UserObserver::class);
         Resource::withoutWrapping();
+        Voyager::addAction(\App\Actions\ActivateDeactivateUser::class);
     }
 }

@@ -6,6 +6,7 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
+    Route::get('activate_deactivate_users/{user_id}', 'AdminController@toggleUserActivateStatus')->name('activate_deactivate');
 });
 
 

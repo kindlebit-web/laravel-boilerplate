@@ -40,4 +40,13 @@ class UserRepository extends BaseRepository
     {
         return User::class;
     }
+
+    public function activateDeactivate($id)
+    {
+        $query = $this->model->newQuery();
+        $model = $query->findOrFail($id);
+        $model->is_active = !$model->is_active;
+        $model->save();
+        return $model;
+    }
 }
