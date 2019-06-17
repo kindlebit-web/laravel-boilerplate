@@ -28,4 +28,15 @@ php artisan serve
 ```
 
 - Goto http://localhost:8000
-- DONE !!
+
+Admin Panel login details
+
+```
+http://localhost:8000/admin
+Email : admin@admin.com
+Password : password
+```
+
+## Laravel Builder Usage
+
+Goto : http://localhost:8000/generator_builder
