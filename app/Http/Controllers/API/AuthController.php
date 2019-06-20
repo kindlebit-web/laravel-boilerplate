@@ -36,28 +36,35 @@ class AuthController extends AppBaseController
             return $this->sendError(__('token_create_failed'));
         }
         
-        if($request->user()->hasVerifiedEmail() == false) {
+        $user = $request->user();
+
+        if($user->hasVerifiedEmail() == false) {
           auth()->logout();
           return $this->sendError(__('email_not_verified'));
         }
 
-        if($request->user()->isActive() == false) {
+        if($user->isActive() == false) {
           auth()->logout();
           return $this->sendError(__('account_deact'));
         }
+        // return $user;
 
-        $user = $request->user();
-        if($request->filled(['device_type', 'device_token'])) {
-          $user->device_type = $request->device_type;
-          $user->device_token = $request->device_token;
-          $user->save();
-        }
+        $user = $this->repo->find($user->id);
+        // return $request->only(['device_type', 'device_token', 'latitude', 'longitude']);
+        $user = $this->repo->update($request->only([
+          'device_type', 'device_token', 'latitude', 'longitude'
+        ]), $user->id);
+        // if($request->filled(['device_type', 'device_token'])) {
+        //   $user->device_type = $request->device_type;
+        //   $user->device_token = $request->device_token;
+        //   $user->save();
+        // }
 
-        if($request->filled(['latitude', 'longitude'])) {
-          $user->latitude = $request->latitude;
-          $user->longitude = $request->longitude;
-          $user->save();
-        }
+        // if($request->filled(['latitude', 'longitude'])) {
+        //   $user->latitude = $request->latitude;
+        //   $user->longitude = $request->longitude;
+        //   $user->save();
+        // }
         $user = new UserResource($user, $token);
         return $this->sendResponse('Success', $user);
     }
