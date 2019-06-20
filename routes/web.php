@@ -3,6 +3,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// sdad
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
