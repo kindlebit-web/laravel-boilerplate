@@ -42,3 +42,16 @@ Password : password
 ( Note : This link be accessed by admin only )
 
 Goto : http://localhost:8000/generator_builder
+
+## Packages Used
+
+- [Laravel Voyager](https://docs.laravelvoyager.com)
+- [Laravel generator](http://labs.infyom.com/laravelgenerator/docs/5.8/introduction)
+- [Jwt Auth](https://github.com/tymondesigns/jwt-auth)
+- [Spatie Media Library](https://github.com/spatie/laravel-medialibrary)
+
+
+## Workflow 
+
+- Whenever you start working on a new feature please checkout to new feature-branch ```git checkout -b feature-branch-name```` .
+- Check the list of these awesome packages before you start a new feature , this may save your hours of time.
